@@ -39,7 +39,7 @@ enum Groups
 
 enum Group0 
 {
-  G0_VOICE = 0,
+  G0_POWER_ON = 0,
 };
 
 enum Group1 
@@ -47,6 +47,13 @@ enum Group1
   G1_RED = 0,
   G1_BLUE = 1,
   G1_GREEN = 2,
+  G1_YELLOW = 3,
+  G1_WHITE = 4,
+  G1_CYAN = 5,
+  G1_MAGENTA = 6,
+  G1_PAUSE = 7,
+  G1_FUCK = 8,
+  G1_POWER_OFF = 9,
 };
 
 
@@ -56,7 +63,6 @@ int8_t group, idx;
 
 void setup()
 {
-
   // bridge mode?
   if (bridge.check())
   {
@@ -66,8 +72,7 @@ void setup()
   // run normally
   Serial.begin(9600);
   port.begin(9600);
-  
-  
+
   if (!easyvr.detect())
   {
     Serial.println("EasyVR not detected!");
@@ -81,20 +86,20 @@ void setup()
 
   group = EasyVR::TRIGGER; //<-- start group (customize)
   
-//////
+  //////
   for(int i = 0; i < 3; i++)
     pinMode(ledPins[i], OUTPUT);
-    
+
   stateToLED();
-//////
+  //////
 }
 
-//////////////
-//void action();
-//////////////
+void action();
 
 void loop()
 {
+  
+  
   easyvr.setPinOutput(EasyVR::IO1, HIGH); // LED on (listening)
 
   Serial.print("Say a command in Group ");
@@ -103,7 +108,6 @@ void loop()
 
   do
   {
-    //setColor(ledPins, BLACK);
     setColorToState(BLACK);
     // can do some processing while waiting for a spoken command
   }
@@ -114,7 +118,7 @@ void loop()
   idx = easyvr.getWord();
   if (idx >= 0)
   {
-    //built-in trigger (ROBOT)
+    // built-in trigger (ROBOT)
     // group = GROUP_X; <-- jump to another group X
     return;
   }
@@ -148,41 +152,27 @@ void loop()
       Serial.println(err, HEX);
     }
   }
-
+  
+  
 }
 
 void action()
 {
-//  if(group == GROUP_0) {
-//    if(idx == G0_VOICE) {
-//      group = GROUP_1;
-//    }
-//  }
-//  
-//  if(group == GROUP_1) {
-//    if(idx == G1_RED) {
-//      Serial.println("red");
-//      setColorToState(RED);
-//    }
-//    else if(idx == G1_BLUE) {
-//      setColorToState(BLUE);
-//    }
-//    else if(idx == G1_GREEN) {
-//      setColorToState(GREEN);
-//    }
-//  }
-  
-  
     switch (group)
     {
     case GROUP_0:
       switch (idx)
       {
-      case G0_VOICE:
+      case G0_POWER_ON:
+        group = GROUP_1;
+        setColor(ledPins, GREEN);
+        delay(100);
+        setColor(ledPins, BLACK);
+        delay(100);
+        setColor(ledPins, GREEN);
+        delay(100);
         // write your action code here
-
-         group = GROUP_1;// <-- or jump to another group X for composite commands
-         
+        // group = GROUP_X; <-- or jump to another group X for composite commands
         break;
       }
       break;
@@ -190,36 +180,71 @@ void action()
       switch (idx)
       {
       case G1_RED:
-
         setColorToState(RED);
         // write your action code here
         // group = GROUP_X; <-- or jump to another group X for composite commands
-     
         break;
       case G1_BLUE:
-
         setColorToState(BLUE);
         // write your action code here
         // group = GROUP_X; <-- or jump to another group X for composite commands
-       break;
+        break;
       case G1_GREEN:
-
-       setColorToState(GREEN);
-        //write your action code here
-        //group = GROUP_X; <-- or jump to another group X for composite commands
+        setColorToState(GREEN);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_YELLOW:
+        setColorToState(YELLOW);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_WHITE:
+        setColorToState(WHITE);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_CYAN:
+        setColorToState(CYAN);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_MAGENTA:
+        setColorToState(MAGENTA);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_PAUSE:
+        setColorToState(BLACK);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_FUCK:
+        setColor(ledPins, RED);
+        delay(500);
+        setColor(ledPins, GREEN);
+        delay(500);
+        setColor(ledPins, BLUE);
+        delay(500);
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
+        break;
+      case G1_POWER_OFF:
+        setColor(ledPins, RED);
+        delay(100);
+        setColor(ledPins, BLACK);
+        delay(100);
+        setColor(ledPins, RED);
+        delay(100);
+        group = GROUP_0;
+        // write your action code here
+        // group = GROUP_X; <-- or jump to another group X for composite commands
         break;
       }
       break;
-
     }
     stateToLED();
-}
 
-// didnt use
-void setColor(int* led, const boolean* color)
-{
-  for(int i = 0; i < 3; i++)
-    digitalWrite(led[i], color[i]);     
 }
 
 void setColorToState(const boolean* color)
@@ -231,4 +256,10 @@ void setColorToState(const boolean* color)
 void stateToLED() {
   for(int i = 0; i < 3; i++)
     digitalWrite(ledPins[i], state[i]);
+}
+
+void setColor(int* led, const boolean* color)
+{
+  for(int i = 0; i < 3; i++)
+    digitalWrite(led[i], color[i]);     
 }
